@@ -673,6 +673,42 @@ function updateCalc(){
 }
 
 // ── 保存 ──
+// ── Google Sheets 連携 ──
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwz92XzoDS4vMk3W0jSnCgThluC1WcYOnxlCEXfSxjN6wExGBuTu6_k-mUsl_RyKByRbw/exec';
+
+function sendToSheets(record){
+  const params = new URLSearchParams({
+    date: record.date||'',
+    time: record.time||'',
+    location: record.location||'',
+    hours: record.hours||'',
+    weather_label: record.weather?.label||'—',
+    weather_temp: record.weather?.temp||'—',
+    revenueTaxInc: record.revenueTaxInc||0,
+    revenueTaxEx: record.revenueTaxEx||0,
+    cogsTotal: record.cogsTotal||0,
+    venueFee: record.venueFee||0,
+    laborTotal: record.laborTotal||0,
+    otherTotal: record.otherTotal||0,
+    netProfit: record.netProfit||0,
+    margin: record.margin||0,
+    customers: record.customers||'',
+    menu: record.menu?.map(m=>`${m.name}×${m.qty}`).join(' / ')||'',
+    memo: record.memo||'',
+  });
+  fetch(GAS_URL + '?' + params.toString())
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.result==='success'){
+        showToast('保存＆スプレッドシートに送信しました！');
+      } else {
+        showToast('ローカル保存済み（シートエラー）');
+      }
+    }).catch(()=>{
+      showToast('ローカル保存済み（シート送信失敗）');
+    });
+}
+
 let savedRecords=JSON.parse(localStorage.getItem('korogi_records')||'[]');
 function getDateStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
@@ -705,6 +741,9 @@ function saveRecord(){
   savedRecords.push(record);
   localStorage.setItem('korogi_records',JSON.stringify(savedRecords));
 
+  // Google Sheetsに送信
+  sendToSheets(record);
+
   // リセット
   document.getElementById('location').value='';
   document.getElementById('customers').value='';
@@ -715,7 +754,6 @@ function saveRecord(){
   staffItems=[];otherCosts=[];
   menuItems=masterItems.map(m=>({...m,qty:0}));
   renderStaffList();renderOtherCosts();renderMenuList();updateCalc();
-  showToast('保存しました！');
 }
 
 // ── 記録表示 ──
