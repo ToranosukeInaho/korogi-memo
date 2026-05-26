@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>現場メモ｜ローストチキンコオロギ</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111;--surface:#1C1C1C;--surface2:#252525;--border:#333;
+  --orange:#FF6B2B;--text:#F0EDE8;--muted:#777;
+  --green:#2ECC71;--red:#E05555;--gold:#D4960A;--blue:#3B82F6;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.app{max-width:480px;margin:0 auto;padding:0 0 140px}
+
+.header{padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10;display:flex;align-items:center;justify-content:space-between}
+.store{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange);letter-spacing:.15em;text-transform:uppercase;margin-bottom:2px}
+.page-title{font-size:18px;font-weight:900}
+.date-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;text-align:right;font-family:'DM Mono',monospace}
+.dc-date{font-size:13px;font-weight:600}
+.dc-day{font-size:10px;color:var(--muted);margin-top:1px}
+
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#161616;border-top:1px solid var(--border);display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;background:none;border:none;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:10px;cursor:pointer;gap:3px;transition:color .15s}
+.tab-icon{font-size:20px;line-height:1}
+.tab-btn.active{color:var(--orange)}
+
+.weather-strip{margin:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.ws-icon{font-size:26px}
+.ws-info{flex:1}
+.ws-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+.ws-val{font-size:14px;font-weight:700;margin-top:2px}
+.ws-temp{font-family:'DM Mono',monospace;font-size:22px;font-weight:600;color:var(--orange)}
+.ws-loading{font-size:12px;color:var(--muted);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.section{margin:14px 16px 0}
+.sec-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.field{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);gap:12px}
+.field:last-child{border-bottom:none}
+.fi{font-size:18px;width:26px;text-align:center;flex-shrink:0}
+.fb{flex:1}
+.fl{font-size:11px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace;letter-spacing:.05em}
+.fn{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);margin-top:2px}
+.fn.auto{color:var(--blue)}
+.field input,.field select,.field textarea{background:none;border:none;outline:none;color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;font-weight:700;width:100%;-webkit-appearance:none;touch-action:manipulation}
+.field input[type=number]{font-family:'DM Mono',monospace;font-size:18px}
+.field input::placeholder,.field textarea::placeholder{color:#444;font-weight:400;font-size:14px}
+.field input.readonly{color:var(--orange);font-size:22px}
+.field textarea{resize:none;line-height:1.6;font-size:13px;font-weight:400;min-height:56px}
+.fu{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);flex-shrink:0}
+.auto-badge{font-family:'DM Mono',monospace;font-size:9px;background:var(--blue);color:white;padding:2px 6px;border-radius:3px;letter-spacing:.08em;flex-shrink:0}
+
+/* 時間ピッカー */
+.time-picker-row{display:flex;gap:8px;align-items:center}
+.time-select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;font-weight:600;padding:6px 8px;outline:none;-webkit-appearance:none;flex:1;touch-action:manipulation}
+.time-sep{font-size:18px;color:var(--muted);font-weight:700}
+.time-or{font-size:11px;color:var(--muted);text-align:center;margin:6px 0}
+
+.toggle-row{display:flex;gap:6px;margin-bottom:10px}
+.toggle-btn{flex:1;padding:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;touch-action:manipulation}
+.toggle-btn.active{background:var(--orange);border-color:var(--orange);color:white}
+
+/* 収支サマリー */
+.profit-summary{background:var(--surface);border:1px solid var(--orange);border-radius:12px;margin:14px 16px 0;overflow:hidden}
+.ps-title{padding:10px 16px;background:#1A1208;font-family:'DM Mono',monospace;font-size:10px;color:var(--orange);letter-spacing:.15em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.ps-title span{font-size:9px;color:var(--muted)}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.ps-item{padding:11px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ps-item:nth-child(even){border-right:none}
+.ps-item:nth-last-child(-n+2){border-bottom:none}
+.ps-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:3px}
+.ps-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700}
+.c-orange{color:var(--orange)}.c-red{color:var(--red)}.c-green{color:var(--green)}.c-gold{color:var(--gold)}.c-blue{color:var(--blue)}.c-muted{color:var(--muted)}
+.ps-net{padding:14px 16px;background:#1A1208;display:flex;justify-content:space-between;align-items:center}
+.ps-net-label{font-size:14px;font-weight:900}
+.ps-net-val{font-family:'DM Mono',monospace;font-size:24px;font-weight:700}
+.ps-margin{padding:6px 16px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);background:#1A1208}
+
+/* 商材 */
+.menu-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.menu-item{padding:10px 14px;border-bottom:1px solid var(--border)}
+.menu-item:last-child{border-bottom:none}
+.mi-top{display:grid;grid-template-columns:1fr auto 28px;align-items:center;gap:8px;margin-bottom:4px}
+.mi-name{font-size:13px;font-weight:700}
+.mi-price{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.qty-ctrl{display:flex;align-items:center;gap:4px;background:var(--surface2);border-radius:8px;padding:3px}
+.qty-btn{width:30px;height:30px;background:var(--border);border:none;border-radius:5px;color:var(--text);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;line-height:1;touch-action:manipulation}
+.qty-btn:active{background:var(--orange)}
+.qty-input{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;width:44px;text-align:center;background:none;border:none;outline:none;color:var(--text);touch-action:manipulation}
+.mi-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.mi-del:active{color:var(--red)}
+.mi-bottom{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.mi-bottom .rev{color:var(--orange)}
+.mi-bottom .profit{color:var(--green)}
+
+/* スタッフ */
+.staff-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.staff-row{display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:flex-end}
+.sf-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.sf-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
+.sf-input:focus{border-color:var(--orange)}
+.staff-del{background:none;border:none;color:#444;font-size:20px;cursor:pointer;padding:4px;margin-bottom:2px;touch-action:manipulation}
+.staff-del:active{color:var(--red)}
+.staff-total{margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green)}
+
+/* その他費用 */
+.cost-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.cost-row{display:grid;grid-template-columns:1fr 100px 28px;gap:8px;align-items:flex-end}
+.cost-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
+.cost-input:focus{border-color:var(--orange)}
+.cost-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;touch-action:manipulation}
+.cost-del:active{color:var(--red)}
+
+.add-btn{width:100%;padding:13px;background:none;border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;cursor:pointer;margin-top:6px;transition:border-color .15s,color .15s;display:flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation}
+.add-btn:active{border-color:var(--orange);color:var(--orange)}
+
+.submit-area{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:0 16px 10px;background:linear-gradient(to top,#111 60%,transparent);z-index:15}
+.submit-btn{width:100%;padding:17px;background:var(--orange);border:none;border-radius:14px;color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;font-weight:900;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.05em;touch-action:manipulation}
+.submit-btn:active{opacity:.85;transform:scale(.98)}
+
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--green);color:white;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:700;z-index:100;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* 記録 */
+.rec-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px}
+.rec-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.rec-place{font-weight:700;font-size:14px}
+.rec-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:2px}
+.rec-revenue{font-family:'DM Mono',monospace;font-size:15px;font-weight:600;color:var(--orange)}
+.rec-detail{color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;margin-top:4px}
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.rg-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em}
+.rg-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-top:2px}
+.rec-net{margin-top:8px;padding:10px 12px;background:#1A1208;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+.rec-net-lbl{font-size:12px;font-weight:900}
+.rec-net-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:700}
+.rec-btns{display:flex;gap:6px;margin-top:8px}
+.rec-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;cursor:pointer;touch-action:manipulation}
+
+/* マスター */
+.master-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.master-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.master-name-txt{font-size:13px;font-weight:900}
+.master-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;touch-action:manipulation}
+.master-del:active{color:var(--red)}
+.master-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.mf label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;display:block;margin-bottom:3px}
+.mf input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
+.mf input:focus{border-color:var(--orange)}
+.master-computed{margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green)}
+
+.smaster-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.sm-row{display:grid;grid-template-columns:1fr 1fr 28px;gap:8px;align-items:flex-end}
+.sm-field label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;display:block;margin-bottom:3px}
+.sm-field input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
+.sm-field input:focus{border-color:var(--orange)}
+.sm-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;margin-bottom:4px;touch-action:manipulation}
+.sm-del:active{color:var(--red)}
+
+/* 設定タブ内の入力追加ボタン */
+.add-master-quick{width:100%;padding:14px;background:var(--orange);border:none;border-radius:12px;color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation}
+
+.page{display:none}.page.active{display:block}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:2}
+.divider{height:1px;background:var(--border);margin:16px 16px 0}
+
+/* 入力中に商材追加 */
+.quick-add-bar{display:flex;align-items:center;gap:8px;margin-top:8px}
+.quick-add-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;font-weight:700;padding:10px 14px;outline:none;touch-action:manipulation}
+.quick-add-input:focus{border-color:var(--orange)}
+.quick-add-btn{background:var(--orange);border:none;border-radius:8px;color:white;font-size:22px;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="store">Roast Chicken Korogi</div>
+      <div class="page-title" id="pageTitle">現場メモ</div>
+    </div>
+    <div class="date-chip">
+      <div class="dc-date" id="dateDisplay">—</div>
+      <div class="dc-day" id="dayDisplay">—</div>
+    </div>
+  </div>
+
+  <!-- PAGE: 入力 -->
+  <div class="page active" id="page-input">
+
+    <div class="weather-strip">
+      <div class="ws-icon" id="weatherIcon">⏳</div>
+      <div class="ws-info">
+        <div class="ws-label">天気（自動取得）</div>
+        <div class="ws-val" id="weatherLabel"><span class="ws-loading">取得中...</span></div>
+      </div>
+      <div class="ws-temp" id="weatherTemp">—</div>
+    </div>
+
+    <!-- 基本情報 -->
+    <div class="section">
+      <div class="sec-label">基本情報</div>
+      <div class="card">
+        <div class="field">
+          <div class="fi">📍</div>
+          <div class="fb">
+            <div class="fl">出店場所</div>
+            <input type="text" id="location" placeholder="例：ベルーナドーム" autocomplete="off">
+          </div>
+        </div>
+        <div class="field">
+          <div class="fi">🕐</div>
+          <div class="fb">
+            <div class="fl">出店時間</div>
+            <div class="time-picker-row">
+              <select class="time-select" id="startHour"></select>
+              <span class="time-sep">:</span>
+              <select class="time-select" id="startMin"></select>
+              <span style="color:var(--muted);font-size:13px;padding:0 4px">〜</span>
+              <select class="time-select" id="endHour"></select>
+              <span class="time-sep">:</span>
+              <select class="time-select" id="endMin"></select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="fi">👥</div>
+          <div class="fb">
+            <div class="fl">客数（後から記入でもOK）</div>
+            <input type="number" id="customers" placeholder="—" inputmode="numeric">
+          </div>
+          <div class="fu">人</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 売上 -->
+    <div class="section">
+      <div class="sec-label">売上</div>
+      <div class="card">
+        <div class="field">
+          <div class="fi">💰</div>
+          <div class="fb">
+            <div class="fl">税込売上合計</div>
+            <input type="text" id="revenueDisplay" class="readonly" readonly value="¥0">
+            <div class="fn auto">商材の販売数から自動計算</div>
+          </div>
+          <div class="auto-badge">AUTO</div>
+        </div>
+        <div class="field">
+          <div class="fi">📊</div>
+          <div class="fb">
+            <div class="fl">消費税率</div>
+            <input type="number" id="taxRate" value="10" inputmode="numeric" oninput="updateCalc()">
+            <div class="fn" id="taxNote">税抜売上: — ／ 税額: —</div>
+          </div>
+          <div class="fu">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 出店料 -->
+    <div class="section">
+      <div class="sec-label">出店料</div>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="btnFixed" onclick="setVenueType('fixed')">固定金額</button>
+        <button class="toggle-btn" id="btnRate" onclick="setVenueType('rate')">歩合（%）</button>
+        <button class="toggle-btn" id="btnNone" onclick="setVenueType('none')">なし</button>
+      </div>
+      <div class="card" id="venueCard">
+        <div class="field" id="venueFixedField">
+          <div class="fi">🏟</div>
+          <div class="fb">
+            <div class="fl">出店料（固定）</div>
+            <input type="number" id="venueFee" placeholder="0" inputmode="numeric" oninput="updateCalc()">
+          </div>
+          <div class="fu">円</div>
+        </div>
+        <div class="field" id="venueRateField" style="display:none">
+          <div class="fi">🏟</div>
+          <div class="fb">
+            <div class="fl">出店料（歩合・税抜売上に対して）</div>
+            <input type="number" id="venueRatePct" placeholder="0" inputmode="numeric" min="0" max="100" oninput="updateCalc()">
+            <div class="fn" id="venueRateNote">= ¥—</div>
+          </div>
+          <div class="fu">%</div>
+        </div>
+        <div class="field">
+          <div class="fi">📝</div>
+          <div class="fb">
+            <div class="fl">備考（任意）</div>
+            <input type="text" id="venueMemo" placeholder="例：売上の15%、上限あり など">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 人件費 -->
+    <div class="section">
+      <div class="sec-label">スタッフ人件費</div>
+      <div id="staffList"></div>
+      <button class="add-btn" id="addStaffFromMaster">+ マスターから追加</button>
+      <button class="add-btn" style="margin-top:6px" id="addStaffManual">+ 当日スタッフを手入力</button>
+    </div>
+
+    <!-- その他費用 -->
+    <div class="section">
+      <div class="sec-label">その他費用</div>
+      <div id="otherCostList"></div>
+      <button class="add-btn" id="addOtherCost">+ 費用を追加（駐車場・光熱費など）</button>
+    </div>
+
+    <!-- 商材 -->
+    <div class="section">
+      <div class="sec-label">商材別 販売数</div>
+      <div class="menu-list" id="menuList"></div>
+      <!-- マスターにない商材をその場で追加 -->
+      <div class="quick-add-bar">
+        <input class="quick-add-input" type="text" id="quickAddName" placeholder="商材名を入力して追加...">
+        <button class="quick-add-btn" onclick="quickAddMenu()">+</button>
+      </div>
+    </div>
+
+    <!-- メモ -->
+    <div class="section">
+      <div class="sec-label">メモ・気づき</div>
+      <div class="card">
+        <div class="field">
+          <div class="fi">📝</div>
+          <div class="fb">
+            <div class="fl">イベント情報・特記事項</div>
+            <textarea id="memo" placeholder="例：近くでマルシェ、14時から急に混んだ、など"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 収支サマリー -->
+    <div class="profit-summary">
+      <div class="ps-title">収支サマリー <span>リアルタイム自動計算</span></div>
+      <div class="ps-grid">
+        <div class="ps-item"><div class="ps-lbl">税込売上</div><div class="ps-val c-orange" id="s-rev-inc">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">税抜売上</div><div class="ps-val c-orange" id="s-rev-ex">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">原価（商材）</div><div class="ps-val c-red" id="s-cogs">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">出店料</div><div class="ps-val c-red" id="s-venue">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">人件費</div><div class="ps-val c-red" id="s-labor">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">その他費用</div><div class="ps-val c-red" id="s-other">¥0</div></div>
+      </div>
+      <div class="ps-net">
+        <div class="ps-net-label">純利益</div>
+        <div class="ps-net-val c-green" id="s-net">¥0</div>
+      </div>
+      <div class="ps-margin" id="s-margin"></div>
+    </div>
+    <div style="height:16px"></div>
+  </div>
+
+  <!-- PAGE: 記録 -->
+  <div class="page" id="page-records">
+    <div class="section" style="margin-top:16px">
+      <div class="sec-label">保存済み記録</div>
+      <div id="savedList"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: 設定 -->
+  <div class="page" id="page-settings">
+    <div class="section" style="margin-top:16px">
+      <div class="sec-label">商材マスター（税込価格・原価率）</div>
+      <div id="masterList"></div>
+      <button class="add-btn" id="addMasterBtn">+ 商材を追加</button>
+    </div>
+    <div class="divider"></div>
+    <div class="section" style="margin-top:16px">
+      <div class="sec-label">スタッフマスター</div>
+      <div id="staffMasterList"></div>
+      <button class="add-btn" id="addStaffMasterBtn">+ スタッフを追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="submit-area" id="submitArea">
+  <button class="submit-btn" onclick="saveRecord()">現場データを保存する</button>
+</div>
+
+<div class="tabbar">
+  <button class="tab-btn active" data-page="input" onclick="switchTab('input')">
+    <span class="tab-icon">✏️</span>入力
+  </button>
+  <button class="tab-btn" data-page="records" onclick="switchTab('records')">
+    <span class="tab-icon">📋</span>記録
+  </button>
+  <button class="tab-btn" data-page="settings" onclick="switchTab('settings')">
+    <span class="tab-icon">⚙️</span>設定
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 日付 ──
+const DAYS=['日','月','火','水','木','金','土'];
+const now=new Date();
+document.getElementById('dateDisplay').textContent=`${now.getMonth()+1}/${now.getDate()}`;
+document.getElementById('dayDisplay').textContent=`${now.getFullYear()} (${DAYS[now.getDay()]})`;
+
+// ── 時間ピッカー生成 ──
+function buildTimePickers(){
+  const hours=['startHour','endHour'];
+  const mins=['startMin','endMin'];
+  hours.forEach(id=>{
+    const sel=document.getElementById(id);
+    for(let h=0;h<24;h++){
+      const opt=document.createElement('option');
+      opt.value=String(h).padStart(2,'0');
+      opt.textContent=String(h).padStart(2,'0');
+      sel.appendChild(opt);
+    }
+    if(id==='startHour') sel.value='10';
+    if(id==='endHour') sel.value='18';
+  });
+  mins.forEach(id=>{
+    const sel=document.getElementById(id);
+    ['00','15','30','45'].forEach(m=>{
+      const opt=document.createElement('option');
+      opt.value=m; opt.textContent=m;
+      sel.appendChild(opt);
+    });
+  });
+}
+buildTimePickers();
+
+function getTimeStr(){
+  const sh=document.getElementById('startHour').value;
+  const sm=document.getElementById('startMin').value;
+  const eh=document.getElementById('endHour').value;
+  const em=document.getElementById('endMin').value;
+  return `${sh}:${sm} 〜 ${eh}:${em}`;
+}
+
+// ── タブ ──
+function switchTab(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  document.getElementById('submitArea').style.display=page==='input'?'block':'none';
+  const titles={input:'現場メモ',records:'記録一覧',settings:'マスター設定'};
+  document.getElementById('pageTitle').textContent=titles[page];
+  if(page==='records')renderSaved();
+  if(page==='settings'){renderMaster();renderStaffMaster();}
+}
+
+// ── 天気 ──
+const wCodes={0:'快晴',1:'晴れ',2:'晴れ時々曇り',3:'曇り',45:'霧',51:'小雨',53:'雨',55:'雨',61:'小雨',63:'雨',65:'大雨',71:'雪',75:'大雪',80:'にわか雨',82:'大雨',95:'雷雨'};
+const wIcons={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',53:'🌧',55:'🌧',61:'🌦',63:'🌧',65:'🌧',71:'🌨',75:'❄️',80:'🌦',82:'⛈',95:'⛈'};
+let weather={icon:'—',label:'取得できず',temp:'—'};
+function getWeather(lat,lon){
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,precipitation&timezone=Asia%2FTokyo`)
+    .then(r=>r.json()).then(d=>{
+      const code=d.current.weathercode,temp=Math.round(d.current.temperature_2m),rain=d.current.precipitation;
+      weather={icon:wIcons[code]||'🌡',label:wCodes[code]||'—',temp:`${temp}℃`,rain:`${rain}mm`,code};
+      document.getElementById('weatherIcon').textContent=weather.icon;
+      document.getElementById('weatherLabel').textContent=weather.label+(rain>0?`（降水${rain}mm）`:'');
+      document.getElementById('weatherTemp').textContent=`${temp}℃`;
+    }).catch(()=>{document.getElementById('weatherLabel').textContent='取得失敗';});
+}
+navigator.geolocation
+  ?navigator.geolocation.getCurrentPosition(p=>getWeather(p.coords.latitude,p.coords.longitude),()=>getWeather(35.6762,139.6503))
+  :getWeather(35.6762,139.6503);
+
+// ── マスター ──
+let masterItems=JSON.parse(localStorage.getItem('korogi_master')||'null')||[
+  {id:1,name:'もも',price:1000,costRate:35},
+  {id:2,name:'パック',price:1900,costRate:35},
+  {id:3,name:'チーズサンド',price:900,costRate:35},
+  {id:4,name:'ハニマスサンド',price:1000,costRate:35},
+  {id:5,name:'てりやきサンド',price:900,costRate:35},
+  {id:6,name:'明太子サンド',price:1000,costRate:35},
+  {id:7,name:'てり丼',price:1200,costRate:35},
+  {id:8,name:'サルサ丼',price:1200,costRate:35},
+  {id:9,name:'プレート',price:1300,costRate:35},
+  {id:10,name:'ケバブ',price:900,costRate:35},
+  {id:11,name:'ポテト塩',price:800,costRate:35},
+];
+let masterNextId=Math.max(...masterItems.map(m=>m.id),0)+1;
+function saveMaster(){localStorage.setItem('korogi_master',JSON.stringify(masterItems));}
+
+let staffMaster=JSON.parse(localStorage.getItem('korogi_staff')||'[]');
+let staffMasterNextId=Math.max(...staffMaster.map(s=>s.id||0),0)+1;
+function saveStaffMaster(){localStorage.setItem('korogi_staff',JSON.stringify(staffMaster));}
+
+// ── 出店料 ──
+let venueType='fixed';
+function setVenueType(type){
+  venueType=type;
+  ['fixed','rate','none'].forEach(t=>{
+    document.getElementById('btn'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===type);
+  });
+  document.getElementById('venueFixedField').style.display=type==='fixed'?'flex':'none';
+  document.getElementById('venueRateField').style.display=type==='rate'?'flex':'none';
+  document.getElementById('venueCard').style.display=type==='none'?'none':'block';
+  updateCalc();
+}
+
+// ── スタッフ ──
+let staffItems=[];
+function renderStaffList(){
+  const c=document.getElementById('staffList');
+  c.innerHTML=staffItems.map((s,i)=>{
+    const labor=Math.round((s.wage||0)*(s.hours||0));
+    return `<div class="staff-item">
+      <div class="staff-row">
+        <div><div class="sf-label">名前</div><input class="sf-input" type="text" value="${s.name||''}" placeholder="スタッフ名" oninput="staffItems[${i}].name=this.value"></div>
+        <div><div class="sf-label">時給(円)</div><input class="sf-input" type="number" value="${s.wage||''}" placeholder="1000" inputmode="numeric" oninput="staffItems[${i}].wage=+this.value;refreshStaff(${i})"></div>
+        <div><div class="sf-label">時間(h)</div><input class="sf-input" type="number" value="${s.hours||''}" placeholder="8.0" inputmode="decimal" step="0.5" oninput="staffItems[${i}].hours=+this.value;refreshStaff(${i})"></div>
+        <button class="staff-del" onclick="removeStaff(${i})">×</button>
+      </div>
+      <div class="staff-total" id="st-${i}">人件費: ¥${labor.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+  updateCalc();
+}
+function refreshStaff(i){
+  const labor=Math.round((staffItems[i].wage||0)*(staffItems[i].hours||0));
+  const el=document.getElementById(`st-${i}`);
+  if(el)el.textContent=`人件費: ¥${labor.toLocaleString()}`;
+  updateCalc();
+}
+function removeStaff(i){staffItems.splice(i,1);renderStaffList();}
+
+document.getElementById('addStaffFromMaster').addEventListener('click',()=>{
+  if(staffMaster.length===0){showToast('設定タブでスタッフを登録してください');return;}
+  const sel=document.createElement('select');
+  sel.innerHTML=`<option value="">スタッフを選択...</option>`+staffMaster.map((s,i)=>`<option value="${i}">${s.name}（時給¥${(s.wage||0).toLocaleString()}）</option>`).join('');
+  sel.style.cssText='position:fixed;bottom:160px;left:50%;transform:translateX(-50%);width:90%;max-width:420px;padding:14px;font-size:16px;border-radius:12px;border:none;background:#222;color:white;z-index:100';
+  sel.onchange=()=>{
+    if(sel.value===''){document.body.removeChild(sel);return;}
+    const s=staffMaster[+sel.value];
+    staffItems.push({name:s.name,wage:s.wage,hours:0});
+    renderStaffList();
+    document.body.removeChild(sel);
+  };
+  document.body.appendChild(sel);
+  sel.focus();
+});
+document.getElementById('addStaffManual').addEventListener('click',()=>{
+  staffItems.push({name:'',wage:0,hours:0});
+  renderStaffList();
+});
+
+// ── その他費用 ──
+let otherCosts=[];
+function renderOtherCosts(){
+  const c=document.getElementById('otherCostList');
+  c.innerHTML=otherCosts.map((oc,i)=>`
+    <div class="cost-item">
+      <div class="cost-row">
+        <div><div class="sf-label">費用名</div><input class="cost-input" type="text" value="${oc.name||''}" placeholder="例：駐車場代" oninput="otherCosts[${i}].name=this.value"></div>
+        <div><div class="sf-label">金額(円)</div><input class="cost-input" type="number" value="${oc.amount||''}" placeholder="0" inputmode="numeric" oninput="otherCosts[${i}].amount=+this.value;updateCalc()"></div>
+        <button class="cost-del" onclick="removeOther(${i})">×</button>
+      </div>
+    </div>`).join('');
+  updateCalc();
+}
+function removeOther(i){otherCosts.splice(i,1);renderOtherCosts();}
+document.getElementById('addOtherCost').addEventListener('click',()=>{otherCosts.push({name:'',amount:0});renderOtherCosts();});
+
+// ── 商材リスト ──
+let menuItems=masterItems.map(m=>({...m,qty:0}));
+
+function renderMenuList(){
+  const list=document.getElementById('menuList');
+  list.innerHTML=menuItems.map((item,i)=>{
+    const qty=item.qty||0;
+    const price=item.price||0;
+    const costRate=item.costRate||0;
+    const lineRev=price*qty;
+    const lineCost=Math.round(price*(costRate/100))*qty;
+    const lineProfit=lineRev-lineCost;
+    return `<div class="menu-item">
+      <div class="mi-top">
+        <div>
+          <div class="mi-name">${item.name||'商材名未設定'}</div>
+          <div class="mi-price">¥${price.toLocaleString()} / 原価率${costRate}%</div>
+        </div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" ontouchstart="" onclick="changeQty(${i},-1)">−</button>
+          <input class="qty-input" type="number" inputmode="numeric" value="${qty}" min="0"
+            onchange="setQty(${i},+this.value)"
+            onfocus="this.select()">
+          <button class="qty-btn" ontouchstart="" onclick="changeQty(${i},1)">＋</button>
+        </div>
+        <button class="mi-del" onclick="deleteMenu(${i})">×</button>
+      </div>
+      <div class="mi-bottom">
+        <span>× ${qty}個</span>
+        ${qty>0?`<span class="rev">売¥${lineRev.toLocaleString()}</span><span class="profit">粗利¥${lineProfit.toLocaleString()}</span>`:'<span></span>'}
+      </div>
+    </div>`;
+  }).join('');
+  updateCalc();
+}
+
+function changeQty(i,delta){
+  menuItems[i].qty=Math.max(0,(menuItems[i].qty||0)+delta);
+  renderMenuList();
+}
+function setQty(i,val){
+  menuItems[i].qty=Math.max(0,isNaN(val)?0:Math.floor(val));
+  renderMenuList();
+}
+function deleteMenu(i){menuItems.splice(i,1);renderMenuList();}
+
+// クイック追加（マスターに登録しつつ入力画面に追加）
+function quickAddMenu(){
+  const input=document.getElementById('quickAddName');
+  const name=input.value.trim();
+  if(!name){showToast('商材名を入力してください');return;}
+  // マスターに追加
+  const newItem={id:masterNextId++,name,price:0,costRate:35};
+  masterItems.push(newItem);
+  saveMaster();
+  // 入力リストに追加
+  menuItems.push({...newItem,qty:0});
+  renderMenuList();
+  input.value='';
+  showToast(`「${name}」を追加しました。設定タブで価格・原価率を登録してください。`);
+}
+
+renderMenuList();
+
+// ── 計算 ──
+function updateCalc(){
+  const revenueTaxInc=menuItems.reduce((sum,m)=>(m.price||0)*(m.qty||0)+sum,0);
+  const taxRate=+(document.getElementById('taxRate').value)||10;
+  const revenueTaxEx=Math.round(revenueTaxInc/(1+taxRate/100));
+  const taxAmt=revenueTaxInc-revenueTaxEx;
+
+  document.getElementById('revenueDisplay').value=revenueTaxInc>0?`¥${revenueTaxInc.toLocaleString()}`:'¥0';
+  document.getElementById('taxNote').textContent=`税抜: ¥${revenueTaxEx.toLocaleString()} ／ 税額: ¥${taxAmt.toLocaleString()}`;
+
+  let venueFee=0;
+  if(venueType==='fixed'){
+    venueFee=+(document.getElementById('venueFee').value)||0;
+  }else if(venueType==='rate'){
+    const pct=+(document.getElementById('venueRatePct').value)||0;
+    venueFee=Math.round(revenueTaxEx*pct/100);
+    document.getElementById('venueRateNote').textContent=`= ¥${venueFee.toLocaleString()}`;
+  }
+
+  const cogsTotal=menuItems.reduce((sum,m)=>sum+Math.round((m.price||0)*((m.costRate||0)/100))*(m.qty||0),0);
+  const laborTotal=staffItems.reduce((sum,s)=>sum+Math.round((s.wage||0)*(s.hours||0)),0);
+  const otherTotal=otherCosts.reduce((sum,oc)=>sum+(oc.amount||0),0);
+  const netProfit=revenueTaxEx-cogsTotal-venueFee-laborTotal-otherTotal;
+  const margin=revenueTaxEx>0?Math.round((netProfit/revenueTaxEx)*100):0;
+
+  document.getElementById('s-rev-inc').textContent='¥'+revenueTaxInc.toLocaleString();
+  document.getElementById('s-rev-ex').textContent='¥'+revenueTaxEx.toLocaleString();
+  document.getElementById('s-cogs').textContent='¥'+cogsTotal.toLocaleString();
+  document.getElementById('s-venue').textContent='¥'+venueFee.toLocaleString();
+  document.getElementById('s-labor').textContent='¥'+laborTotal.toLocaleString();
+  document.getElementById('s-other').textContent='¥'+otherTotal.toLocaleString();
+  document.getElementById('s-net').textContent='¥'+netProfit.toLocaleString();
+  document.getElementById('s-net').className='ps-net-val '+(netProfit>=0?'c-green':'c-red');
+  document.getElementById('s-margin').textContent=revenueTaxEx>0?`純利益率: ${margin}%（税抜売上に対して）`:'';
+
+  return{revenueTaxInc,revenueTaxEx,taxRate,venueFee,cogsTotal,laborTotal,otherTotal,netProfit,margin};
+}
+
+// ── 保存 ──
+let savedRecords=JSON.parse(localStorage.getItem('korogi_records')||'[]');
+function getDateStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function saveRecord(){
+  const calc=updateCalc();
+  const t=new Date();
+  const timeStr=`${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+  const record={
+    date:getDateStr(),time:timeStr,
+    location:document.getElementById('location').value.trim(),
+    hours:getTimeStr(),
+    customers:document.getElementById('customers').value,
+    memo:document.getElementById('memo').value.trim(),
+    weather,
+    revenueTaxInc:calc.revenueTaxInc,
+    revenueTaxEx:calc.revenueTaxEx,
+    taxRate:calc.taxRate,
+    venueType,
+    venueFee:calc.venueFee,
+    venueMemo:document.getElementById('venueMemo').value.trim(),
+    staff:staffItems.map(s=>({name:s.name,wage:s.wage,hours:s.hours,total:Math.round((s.wage||0)*(s.hours||0))})),
+    laborTotal:calc.laborTotal,
+    otherCosts:[...otherCosts],
+    otherTotal:calc.otherTotal,
+    menu:menuItems.filter(m=>(m.qty||0)>0).map(m=>({name:m.name,price:m.price,costRate:m.costRate,qty:m.qty})),
+    cogsTotal:calc.cogsTotal,
+    netProfit:calc.netProfit,
+    margin:calc.margin,
+  };
+  savedRecords.push(record);
+  localStorage.setItem('korogi_records',JSON.stringify(savedRecords));
+
+  // リセット
+  document.getElementById('location').value='';
+  document.getElementById('customers').value='';
+  document.getElementById('memo').value='';
+  document.getElementById('venueFee').value='';
+  document.getElementById('venueRatePct').value='';
+  document.getElementById('venueMemo').value='';
+  staffItems=[];otherCosts=[];
+  menuItems=masterItems.map(m=>({...m,qty:0}));
+  renderStaffList();renderOtherCosts();renderMenuList();updateCalc();
+  showToast('保存しました！');
+}
+
+// ── 記録表示 ──
+function renderSaved(){
+  const c=document.getElementById('savedList');
+  if(savedRecords.length===0){c.innerHTML=`<div class="empty-state">まだ記録がありません</div>`;return;}
+  c.innerHTML=[...savedRecords].reverse().map((r,ri)=>{
+    const idx=savedRecords.length-1-ri;
+    const menuStr=r.menu?.map(m=>`${m.name}×${m.qty}`).join(' / ')||'—';
+    const nc=r.netProfit>=0?'c-green':'c-red';
+    return `<div class="rec-item">
+      <div class="rec-head">
+        <div>
+          <div class="rec-place">${r.location||'場所未記入'}</div>
+          <div class="rec-time">${r.date} ${r.time} ／ ${r.hours||'—'} ${r.weather?.icon||''} ${r.weather?.temp||''}</div>
+        </div>
+        <div class="rec-revenue">¥${(r.revenueTaxInc||0).toLocaleString()}</div>
+      </div>
+      <div class="rec-detail">${menuStr}</div>
+      <div class="rec-grid">
+        <div><div class="rg-lbl">税抜売上</div><div class="rg-val c-orange">¥${(r.revenueTaxEx||0).toLocaleString()}</div></div>
+        <div><div class="rg-lbl">原価</div><div class="rg-val c-red">¥${(r.cogsTotal||0).toLocaleString()}</div></div>
+        <div><div class="rg-lbl">出店料</div><div class="rg-val c-red">¥${(r.venueFee||0).toLocaleString()}</div></div>
+        <div><div class="rg-lbl">人件費</div><div class="rg-val c-red">¥${(r.laborTotal||0).toLocaleString()}</div></div>
+        <div><div class="rg-lbl">その他</div><div class="rg-val c-red">¥${(r.otherTotal||0).toLocaleString()}</div></div>
+        <div><div class="rg-lbl">客数</div><div class="rg-val c-muted">${r.customers||'—'}人</div></div>
+      </div>
+      <div class="rec-net">
+        <div class="rec-net-lbl">純利益</div>
+        <div class="rec-net-val ${nc}">¥${(r.netProfit||0).toLocaleString()} <span style="font-size:12px;opacity:.7">${r.margin||0}%</span></div>
+      </div>
+      ${r.memo?`<div style="margin-top:8px;font-size:11px;color:#666">${r.memo}</div>`:''}
+      <div class="rec-btns">
+        <button class="rec-btn" onclick="deleteRecord(${idx})">削除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function deleteRecord(i){
+  if(!confirm('削除しますか？\n※この操作は取り消せません。'))return;
+  savedRecords.splice(i,1);
+  localStorage.setItem('korogi_records',JSON.stringify(savedRecords));
+  renderSaved();
+}
+
+// ── 商材マスター ──
+function renderMaster(){
+  const c=document.getElementById('masterList');
+  c.innerHTML=masterItems.map((m,i)=>{
+    const cp=Math.round(m.price*(m.costRate/100));
+    return `<div class="master-item">
+      <div class="master-top"><div class="master-name-txt">${m.name||'新規商材'}</div><button class="master-del" onclick="deleteMaster(${i})">×</button></div>
+      <div class="master-fields">
+        <div class="mf"><label>商材名</label><input type="text" value="${m.name}" oninput="masterItems[${i}].name=this.value;saveMaster();document.querySelectorAll('.master-name-txt')[${i}].textContent=this.value||'新規商材'"></div>
+        <div class="mf"><label>税込価格(円)</label><input type="number" value="${m.price}" inputmode="numeric" oninput="masterItems[${i}].price=+this.value;saveMaster();refreshMC(${i})"></div>
+        <div class="mf"><label>原価率(%)</label><input type="number" value="${m.costRate}" inputmode="numeric" min="0" max="100" oninput="masterItems[${i}].costRate=+this.value;saveMaster();refreshMC(${i})"></div>
+      </div>
+      <div class="master-computed" id="mc-${i}">原価 ¥${cp.toLocaleString()} ／ 粗利 ¥${(m.price-cp).toLocaleString()}（粗利率 ${100-m.costRate}%）</div>
+    </div>`;
+  }).join('');
+}
+function refreshMC(i){
+  const m=masterItems[i];
+  const cp=Math.round(m.price*(m.costRate/100));
+  const el=document.getElementById(`mc-${i}`);
+  if(el)el.textContent=`原価 ¥${cp.toLocaleString()} ／ 粗利 ¥${(m.price-cp).toLocaleString()}（粗利率 ${100-m.costRate}%）`;
+}
+function deleteMaster(i){if(!confirm(`「${masterItems[i].name}」を削除しますか？`))return;masterItems.splice(i,1);saveMaster();renderMaster();}
+document.getElementById('addMasterBtn').addEventListener('click',()=>{masterItems.push({id:masterNextId++,name:'',price:0,costRate:35});saveMaster();renderMaster();});
+
+// ── スタッフマスター ──
+function renderStaffMaster(){
+  const c=document.getElementById('staffMasterList');
+  if(staffMaster.length===0){c.innerHTML=`<div class="empty-state">スタッフが未登録です</div>`;return;}
+  c.innerHTML=staffMaster.map((s,i)=>`
+    <div class="smaster-item">
+      <div class="sm-row">
+        <div class="sm-field"><label>名前</label><input type="text" value="${s.name||''}" oninput="staffMaster[${i}].name=this.value;saveStaffMaster()"></div>
+        <div class="sm-field"><label>時給(円)</label><input type="number" value="${s.wage||''}" inputmode="numeric" oninput="staffMaster[${i}].wage=+this.value;saveStaffMaster()"></div>
+        <button class="sm-del" onclick="deleteStaffMaster(${i})">×</button>
+      </div>
+    </div>`).join('');
+}
+function deleteStaffMaster(i){if(!confirm('削除しますか？'))return;staffMaster.splice(i,1);saveStaffMaster();renderStaffMaster();}
+document.getElementById('addStaffMasterBtn').addEventListener('click',()=>{staffMaster.push({id:staffMasterNextId++,name:'',wage:0});saveStaffMaster();renderStaffMaster();});
+
+// ── Toast ──
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>
