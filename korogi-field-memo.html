@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>現場メモ｜ローストチキンコオロギ</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -12,7 +12,7 @@
   --orange:#FF6B2B;--text:#F0EDE8;--muted:#777;
   --green:#2ECC71;--red:#E05555;--gold:#D4960A;--blue:#3B82F6;
 }
-html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .app{max-width:480px;margin:0 auto;padding:0 0 140px}
 
 .header{padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10;display:flex;align-items:center;justify-content:space-between}
@@ -47,18 +47,22 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
 .fl{font-size:11px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace;letter-spacing:.05em}
 .fn{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);margin-top:2px}
 .fn.auto{color:var(--blue)}
-.field input,.field select,.field textarea{background:none;border:none;outline:none;color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;font-weight:700;width:100%;-webkit-appearance:none}
+.field input,.field select,.field textarea{background:none;border:none;outline:none;color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;font-weight:700;width:100%;-webkit-appearance:none;touch-action:manipulation}
 .field input[type=number]{font-family:'DM Mono',monospace;font-size:18px}
 .field input::placeholder,.field textarea::placeholder{color:#444;font-weight:400;font-size:14px}
 .field input.readonly{color:var(--orange);font-size:22px}
 .field textarea{resize:none;line-height:1.6;font-size:13px;font-weight:400;min-height:56px}
 .fu{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);flex-shrink:0}
-
-/* 自動計算バッジ */
 .auto-badge{font-family:'DM Mono',monospace;font-size:9px;background:var(--blue);color:white;padding:2px 6px;border-radius:3px;letter-spacing:.08em;flex-shrink:0}
 
+/* 時間ピッカー */
+.time-picker-row{display:flex;gap:8px;align-items:center}
+.time-select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:15px;font-weight:600;padding:6px 8px;outline:none;-webkit-appearance:none;flex:1;touch-action:manipulation}
+.time-sep{font-size:18px;color:var(--muted);font-weight:700}
+.time-or{font-size:11px;color:var(--muted);text-align:center;margin:6px 0}
+
 .toggle-row{display:flex;gap:6px;margin-bottom:10px}
-.toggle-btn{flex:1;padding:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
+.toggle-btn{flex:1;padding:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;touch-action:manipulation}
 .toggle-btn.active{background:var(--orange);border-color:var(--orange);color:white}
 
 /* 収支サマリー */
@@ -81,13 +85,14 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
 .menu-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .menu-item{padding:10px 14px;border-bottom:1px solid var(--border)}
 .menu-item:last-child{border-bottom:none}
-.mi-top{display:grid;grid-template-columns:1fr 108px 28px;align-items:center;gap:8px;margin-bottom:4px}
-.mi-name{font-size:13px;font-weight:700;color:var(--text)}
-.qty-ctrl{display:flex;align-items:center;gap:4px;background:var(--surface2);border-radius:7px;padding:3px}
-.qty-btn{width:28px;height:28px;background:var(--border);border:none;border-radius:5px;color:var(--text);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;line-height:1}
+.mi-top{display:grid;grid-template-columns:1fr auto 28px;align-items:center;gap:8px;margin-bottom:4px}
+.mi-name{font-size:13px;font-weight:700}
+.mi-price{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.qty-ctrl{display:flex;align-items:center;gap:4px;background:var(--surface2);border-radius:8px;padding:3px}
+.qty-btn{width:30px;height:30px;background:var(--border);border:none;border-radius:5px;color:var(--text);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;line-height:1;touch-action:manipulation}
 .qty-btn:active{background:var(--orange)}
-.qty-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;min-width:24px;text-align:center}
-.mi-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center}
+.qty-input{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;width:44px;text-align:center;background:none;border:none;outline:none;color:var(--text);touch-action:manipulation}
+.mi-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .mi-del:active{color:var(--red)}
 .mi-bottom{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
 .mi-bottom .rev{color:var(--orange)}
@@ -97,25 +102,25 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
 .staff-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
 .staff-row{display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:flex-end}
 .sf-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
-.sf-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none}
+.sf-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
 .sf-input:focus{border-color:var(--orange)}
-.staff-del{background:none;border:none;color:#444;font-size:20px;cursor:pointer;padding:4px;margin-bottom:2px}
+.staff-del{background:none;border:none;color:#444;font-size:20px;cursor:pointer;padding:4px;margin-bottom:2px;touch-action:manipulation}
 .staff-del:active{color:var(--red)}
 .staff-total{margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green)}
 
 /* その他費用 */
 .cost-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
 .cost-row{display:grid;grid-template-columns:1fr 100px 28px;gap:8px;align-items:flex-end}
-.cost-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none}
+.cost-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
 .cost-input:focus{border-color:var(--orange)}
-.cost-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px}
+.cost-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;touch-action:manipulation}
 .cost-del:active{color:var(--red)}
 
-.add-btn{width:100%;padding:13px;background:none;border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;cursor:pointer;margin-top:6px;transition:border-color .15s,color .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-btn{width:100%;padding:13px;background:none;border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;cursor:pointer;margin-top:6px;transition:border-color .15s,color .15s;display:flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation}
 .add-btn:active{border-color:var(--orange);color:var(--orange)}
 
 .submit-area{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:0 16px 10px;background:linear-gradient(to top,#111 60%,transparent);z-index:15}
-.submit-btn{width:100%;padding:17px;background:var(--orange);border:none;border-radius:14px;color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;font-weight:900;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.05em}
+.submit-btn{width:100%;padding:17px;background:var(--orange);border:none;border-radius:14px;color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;font-weight:900;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.05em;touch-action:manipulation}
 .submit-btn:active{opacity:.85;transform:scale(.98)}
 
 .toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--green);color:white;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:700;z-index:100;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4)}
@@ -135,31 +140,40 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
 .rec-net-lbl{font-size:12px;font-weight:900}
 .rec-net-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:700}
 .rec-btns{display:flex;gap:6px;margin-top:8px}
-.rec-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;cursor:pointer}
+.rec-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:5px 12px;cursor:pointer;touch-action:manipulation}
 
 /* マスター */
 .master-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
 .master-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .master-name-txt{font-size:13px;font-weight:900}
-.master-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer}
+.master-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;touch-action:manipulation}
 .master-del:active{color:var(--red)}
 .master-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .mf label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;display:block;margin-bottom:3px}
-.mf input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none}
+.mf input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
 .mf input:focus{border-color:var(--orange)}
 .master-computed{margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--green)}
 
 .smaster-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
 .sm-row{display:grid;grid-template-columns:1fr 1fr 28px;gap:8px;align-items:flex-end}
 .sm-field label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;display:block;margin-bottom:3px}
-.sm-field input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none}
+.sm-field input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:600;width:100%;padding:7px 9px;outline:none;touch-action:manipulation}
 .sm-field input:focus{border-color:var(--orange)}
-.sm-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;margin-bottom:4px}
+.sm-del{background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:2px;margin-bottom:4px;touch-action:manipulation}
 .sm-del:active{color:var(--red)}
+
+/* 設定タブ内の入力追加ボタン */
+.add-master-quick{width:100%;padding:14px;background:var(--orange);border:none;border-radius:12px;color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation}
 
 .page{display:none}.page.active{display:block}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:2}
 .divider{height:1px;background:var(--border);margin:16px 16px 0}
+
+/* 入力中に商材追加 */
+.quick-add-bar{display:flex;align-items:center;gap:8px;margin-top:8px}
+.quick-add-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;font-weight:700;padding:10px 14px;outline:none;touch-action:manipulation}
+.quick-add-input:focus{border-color:var(--orange)}
+.quick-add-btn{background:var(--orange);border:none;border-radius:8px;color:white;font-size:22px;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -202,7 +216,15 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
           <div class="fi">🕐</div>
           <div class="fb">
             <div class="fl">出店時間</div>
-            <input type="text" id="hours" placeholder="例：11:00 〜 18:00">
+            <div class="time-picker-row">
+              <select class="time-select" id="startHour"></select>
+              <span class="time-sep">:</span>
+              <select class="time-select" id="startMin"></select>
+              <span style="color:var(--muted);font-size:13px;padding:0 4px">〜</span>
+              <select class="time-select" id="endHour"></select>
+              <span class="time-sep">:</span>
+              <select class="time-select" id="endMin"></select>
+            </div>
           </div>
         </div>
         <div class="field">
@@ -216,7 +238,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
       </div>
     </div>
 
-    <!-- 売上（自動計算） -->
+    <!-- 売上 -->
     <div class="section">
       <div class="sec-label">売上</div>
       <div class="card">
@@ -292,11 +314,15 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
       <button class="add-btn" id="addOtherCost">+ 費用を追加（駐車場・光熱費など）</button>
     </div>
 
-    <!-- 商材（メイン） -->
+    <!-- 商材 -->
     <div class="section">
-      <div class="sec-label">商材別 販売数 → 売上に自動反映</div>
+      <div class="sec-label">商材別 販売数</div>
       <div class="menu-list" id="menuList"></div>
-      <button class="add-btn" style="margin-top:8px" id="addMenuBtn">+ 商材を追加（マスター外）</button>
+      <!-- マスターにない商材をその場で追加 -->
+      <div class="quick-add-bar">
+        <input class="quick-add-input" type="text" id="quickAddName" placeholder="商材名を入力して追加...">
+        <button class="quick-add-btn" onclick="quickAddMenu()">+</button>
+      </div>
     </div>
 
     <!-- メモ -->
@@ -314,33 +340,15 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
     </div>
 
     <!-- 収支サマリー -->
-    <div class="profit-summary" id="profitSummary">
+    <div class="profit-summary">
       <div class="ps-title">収支サマリー <span>リアルタイム自動計算</span></div>
       <div class="ps-grid">
-        <div class="ps-item">
-          <div class="ps-lbl">税込売上</div>
-          <div class="ps-val c-orange" id="s-rev-inc">¥0</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-lbl">税抜売上</div>
-          <div class="ps-val c-orange" id="s-rev-ex">¥0</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-lbl">原価（商材）</div>
-          <div class="ps-val c-red" id="s-cogs">¥0</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-lbl">出店料</div>
-          <div class="ps-val c-red" id="s-venue">¥0</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-lbl">人件費</div>
-          <div class="ps-val c-red" id="s-labor">¥0</div>
-        </div>
-        <div class="ps-item">
-          <div class="ps-lbl">その他費用</div>
-          <div class="ps-val c-red" id="s-other">¥0</div>
-        </div>
+        <div class="ps-item"><div class="ps-lbl">税込売上</div><div class="ps-val c-orange" id="s-rev-inc">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">税抜売上</div><div class="ps-val c-orange" id="s-rev-ex">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">原価（商材）</div><div class="ps-val c-red" id="s-cogs">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">出店料</div><div class="ps-val c-red" id="s-venue">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">人件費</div><div class="ps-val c-red" id="s-labor">¥0</div></div>
+        <div class="ps-item"><div class="ps-lbl">その他費用</div><div class="ps-val c-red" id="s-other">¥0</div></div>
       </div>
       <div class="ps-net">
         <div class="ps-net-label">純利益</div>
@@ -348,7 +356,6 @@ html,body{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic Ne
       </div>
       <div class="ps-margin" id="s-margin"></div>
     </div>
-
     <div style="height:16px"></div>
   </div>
 
@@ -401,6 +408,40 @@ const now=new Date();
 document.getElementById('dateDisplay').textContent=`${now.getMonth()+1}/${now.getDate()}`;
 document.getElementById('dayDisplay').textContent=`${now.getFullYear()} (${DAYS[now.getDay()]})`;
 
+// ── 時間ピッカー生成 ──
+function buildTimePickers(){
+  const hours=['startHour','endHour'];
+  const mins=['startMin','endMin'];
+  hours.forEach(id=>{
+    const sel=document.getElementById(id);
+    for(let h=0;h<24;h++){
+      const opt=document.createElement('option');
+      opt.value=String(h).padStart(2,'0');
+      opt.textContent=String(h).padStart(2,'0');
+      sel.appendChild(opt);
+    }
+    if(id==='startHour') sel.value='10';
+    if(id==='endHour') sel.value='18';
+  });
+  mins.forEach(id=>{
+    const sel=document.getElementById(id);
+    ['00','15','30','45'].forEach(m=>{
+      const opt=document.createElement('option');
+      opt.value=m; opt.textContent=m;
+      sel.appendChild(opt);
+    });
+  });
+}
+buildTimePickers();
+
+function getTimeStr(){
+  const sh=document.getElementById('startHour').value;
+  const sm=document.getElementById('startMin').value;
+  const eh=document.getElementById('endHour').value;
+  const em=document.getElementById('endMin').value;
+  return `${sh}:${sm} 〜 ${eh}:${em}`;
+}
+
 // ── タブ ──
 function switchTab(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -432,7 +473,7 @@ navigator.geolocation
   ?navigator.geolocation.getCurrentPosition(p=>getWeather(p.coords.latitude,p.coords.longitude),()=>getWeather(35.6762,139.6503))
   :getWeather(35.6762,139.6503);
 
-// ── マスターデータ ──
+// ── マスター ──
 let masterItems=JSON.parse(localStorage.getItem('korogi_master')||'null')||[
   {id:1,name:'もも',price:1000,costRate:35},
   {id:2,name:'パック',price:1900,costRate:35},
@@ -453,7 +494,7 @@ let staffMaster=JSON.parse(localStorage.getItem('korogi_staff')||'[]');
 let staffMasterNextId=Math.max(...staffMaster.map(s=>s.id||0),0)+1;
 function saveStaffMaster(){localStorage.setItem('korogi_staff',JSON.stringify(staffMaster));}
 
-// ── 出店料タイプ ──
+// ── 出店料 ──
 let venueType='fixed';
 function setVenueType(type){
   venueType=type;
@@ -543,17 +584,22 @@ function renderMenuList(){
     const lineProfit=lineRev-lineCost;
     return `<div class="menu-item">
       <div class="mi-top">
-        <div class="mi-name">${item.name||'商材名未設定'}</div>
+        <div>
+          <div class="mi-name">${item.name||'商材名未設定'}</div>
+          <div class="mi-price">¥${price.toLocaleString()} / 原価率${costRate}%</div>
+        </div>
         <div class="qty-ctrl">
           <button class="qty-btn" ontouchstart="" onclick="changeQty(${i},-1)">−</button>
-          <span class="qty-val">${qty}</span>
+          <input class="qty-input" type="number" inputmode="numeric" value="${qty}" min="0"
+            onchange="setQty(${i},+this.value)"
+            onfocus="this.select()">
           <button class="qty-btn" ontouchstart="" onclick="changeQty(${i},1)">＋</button>
         </div>
         <button class="mi-del" onclick="deleteMenu(${i})">×</button>
       </div>
       <div class="mi-bottom">
-        <span>¥${price.toLocaleString()} × ${qty}</span>
-        ${qty>0?`<span class="rev">¥${lineRev.toLocaleString()}</span><span class="profit">粗利¥${lineProfit.toLocaleString()}</span>`:'<span></span>'}
+        <span>× ${qty}個</span>
+        ${qty>0?`<span class="rev">売¥${lineRev.toLocaleString()}</span><span class="profit">粗利¥${lineProfit.toLocaleString()}</span>`:'<span></span>'}
       </div>
     </div>`;
   }).join('');
@@ -564,26 +610,40 @@ function changeQty(i,delta){
   menuItems[i].qty=Math.max(0,(menuItems[i].qty||0)+delta);
   renderMenuList();
 }
-function deleteMenu(i){menuItems.splice(i,1);renderMenuList();}
-document.getElementById('addMenuBtn').addEventListener('click',()=>{
-  menuItems.push({id:Date.now(),name:'',price:0,costRate:35,qty:0});
+function setQty(i,val){
+  menuItems[i].qty=Math.max(0,isNaN(val)?0:Math.floor(val));
   renderMenuList();
-});
+}
+function deleteMenu(i){menuItems.splice(i,1);renderMenuList();}
+
+// クイック追加（マスターに登録しつつ入力画面に追加）
+function quickAddMenu(){
+  const input=document.getElementById('quickAddName');
+  const name=input.value.trim();
+  if(!name){showToast('商材名を入力してください');return;}
+  // マスターに追加
+  const newItem={id:masterNextId++,name,price:0,costRate:35};
+  masterItems.push(newItem);
+  saveMaster();
+  // 入力リストに追加
+  menuItems.push({...newItem,qty:0});
+  renderMenuList();
+  input.value='';
+  showToast(`「${name}」を追加しました。設定タブで価格・原価率を登録してください。`);
+}
+
 renderMenuList();
 
-// ── 計算（商材合計 → 売上自動反映） ──
+// ── 計算 ──
 function updateCalc(){
-  // 商材から税込売上を自動計算
   const revenueTaxInc=menuItems.reduce((sum,m)=>(m.price||0)*(m.qty||0)+sum,0);
   const taxRate=+(document.getElementById('taxRate').value)||10;
   const revenueTaxEx=Math.round(revenueTaxInc/(1+taxRate/100));
   const taxAmt=revenueTaxInc-revenueTaxEx;
 
-  // 売上欄に自動反映
   document.getElementById('revenueDisplay').value=revenueTaxInc>0?`¥${revenueTaxInc.toLocaleString()}`:'¥0';
   document.getElementById('taxNote').textContent=`税抜: ¥${revenueTaxEx.toLocaleString()} ／ 税額: ¥${taxAmt.toLocaleString()}`;
 
-  // 出店料
   let venueFee=0;
   if(venueType==='fixed'){
     venueFee=+(document.getElementById('venueFee').value)||0;
@@ -593,20 +653,12 @@ function updateCalc(){
     document.getElementById('venueRateNote').textContent=`= ¥${venueFee.toLocaleString()}`;
   }
 
-  // 原価
   const cogsTotal=menuItems.reduce((sum,m)=>sum+Math.round((m.price||0)*((m.costRate||0)/100))*(m.qty||0),0);
-
-  // 人件費
   const laborTotal=staffItems.reduce((sum,s)=>sum+Math.round((s.wage||0)*(s.hours||0)),0);
-
-  // その他
   const otherTotal=otherCosts.reduce((sum,oc)=>sum+(oc.amount||0),0);
-
-  // 純利益
   const netProfit=revenueTaxEx-cogsTotal-venueFee-laborTotal-otherTotal;
   const margin=revenueTaxEx>0?Math.round((netProfit/revenueTaxEx)*100):0;
 
-  // サマリー更新
   document.getElementById('s-rev-inc').textContent='¥'+revenueTaxInc.toLocaleString();
   document.getElementById('s-rev-ex').textContent='¥'+revenueTaxEx.toLocaleString();
   document.getElementById('s-cogs').textContent='¥'+cogsTotal.toLocaleString();
@@ -615,12 +667,47 @@ function updateCalc(){
   document.getElementById('s-other').textContent='¥'+otherTotal.toLocaleString();
   document.getElementById('s-net').textContent='¥'+netProfit.toLocaleString();
   document.getElementById('s-net').className='ps-net-val '+(netProfit>=0?'c-green':'c-red');
-  document.getElementById('s-margin').textContent=revenueTaxEx>0?`純利益率: ${margin}%　（税抜売上に対して）`:'';
+  document.getElementById('s-margin').textContent=revenueTaxEx>0?`純利益率: ${margin}%（税抜売上に対して）`:'';
 
   return{revenueTaxInc,revenueTaxEx,taxRate,venueFee,cogsTotal,laborTotal,otherTotal,netProfit,margin};
 }
 
 // ── 保存 ──
+// ── Google Sheets 連携 ──
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwz92XzoDS4vMk3W0jSnCgThluC1WcYOnxlCEXfSxjN6wExGBuTu6_k-mUsl_RyKByRbw/exec';
+
+function sendToSheets(record){
+  const payload={
+    date: record.date,
+    time: record.time,
+    location: record.location,
+    hours: record.hours,
+    weather_label: record.weather?.label||'—',
+    weather_temp: record.weather?.temp||'—',
+    revenueTaxInc: record.revenueTaxInc,
+    revenueTaxEx: record.revenueTaxEx,
+    cogsTotal: record.cogsTotal,
+    venueFee: record.venueFee,
+    laborTotal: record.laborTotal,
+    otherTotal: record.otherTotal,
+    netProfit: record.netProfit,
+    margin: record.margin,
+    customers: record.customers||'',
+    menu: record.menu?.map(m=>`${m.name}×${m.qty}`).join(' / ')||'',
+    memo: record.memo||'',
+  };
+  fetch(GAS_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(()=>{
+    showToast('保存＆スプレッドシートに送信しました！');
+  }).catch(()=>{
+    showToast('ローカル保存済み（シート送信失敗）');
+  });
+}
+
 let savedRecords=JSON.parse(localStorage.getItem('korogi_records')||'[]');
 function getDateStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
@@ -631,7 +718,7 @@ function saveRecord(){
   const record={
     date:getDateStr(),time:timeStr,
     location:document.getElementById('location').value.trim(),
-    hours:document.getElementById('hours').value.trim(),
+    hours:getTimeStr(),
     customers:document.getElementById('customers').value,
     memo:document.getElementById('memo').value.trim(),
     weather,
@@ -653,9 +740,11 @@ function saveRecord(){
   savedRecords.push(record);
   localStorage.setItem('korogi_records',JSON.stringify(savedRecords));
 
+  // Google Sheetsに送信
+  sendToSheets(record);
+
   // リセット
   document.getElementById('location').value='';
-  document.getElementById('hours').value='';
   document.getElementById('customers').value='';
   document.getElementById('memo').value='';
   document.getElementById('venueFee').value='';
@@ -664,7 +753,6 @@ function saveRecord(){
   staffItems=[];otherCosts=[];
   menuItems=masterItems.map(m=>({...m,qty:0}));
   renderStaffList();renderOtherCosts();renderMenuList();updateCalc();
-  showToast('保存しました！');
 }
 
 // ── 記録表示 ──
@@ -703,7 +791,12 @@ function renderSaved(){
     </div>`;
   }).join('');
 }
-function deleteRecord(i){if(!confirm('削除しますか？'))return;savedRecords.splice(i,1);localStorage.setItem('korogi_records',JSON.stringify(savedRecords));renderSaved();}
+function deleteRecord(i){
+  if(!confirm('削除しますか？\n※この操作は取り消せません。'))return;
+  savedRecords.splice(i,1);
+  localStorage.setItem('korogi_records',JSON.stringify(savedRecords));
+  renderSaved();
+}
 
 // ── 商材マスター ──
 function renderMaster(){
@@ -714,18 +807,18 @@ function renderMaster(){
       <div class="master-top"><div class="master-name-txt">${m.name||'新規商材'}</div><button class="master-del" onclick="deleteMaster(${i})">×</button></div>
       <div class="master-fields">
         <div class="mf"><label>商材名</label><input type="text" value="${m.name}" oninput="masterItems[${i}].name=this.value;saveMaster();document.querySelectorAll('.master-name-txt')[${i}].textContent=this.value||'新規商材'"></div>
-        <div class="mf"><label>税込価格(円)</label><input type="number" value="${m.price}" inputmode="numeric" oninput="masterItems[${i}].price=+this.value;saveMaster();refreshMasterComputed(${i})"></div>
-        <div class="mf"><label>原価率(%)</label><input type="number" value="${m.costRate}" inputmode="numeric" min="0" max="100" oninput="masterItems[${i}].costRate=+this.value;saveMaster();refreshMasterComputed(${i})"></div>
+        <div class="mf"><label>税込価格(円)</label><input type="number" value="${m.price}" inputmode="numeric" oninput="masterItems[${i}].price=+this.value;saveMaster();refreshMC(${i})"></div>
+        <div class="mf"><label>原価率(%)</label><input type="number" value="${m.costRate}" inputmode="numeric" min="0" max="100" oninput="masterItems[${i}].costRate=+this.value;saveMaster();refreshMC(${i})"></div>
       </div>
-      <div class="master-computed" id="mc-${i}">原価 ¥${cp.toLocaleString()} ／ 粗利 ¥${(m.price-cp).toLocaleString()} （粗利率 ${100-m.costRate}%）</div>
+      <div class="master-computed" id="mc-${i}">原価 ¥${cp.toLocaleString()} ／ 粗利 ¥${(m.price-cp).toLocaleString()}（粗利率 ${100-m.costRate}%）</div>
     </div>`;
   }).join('');
 }
-function refreshMasterComputed(i){
+function refreshMC(i){
   const m=masterItems[i];
   const cp=Math.round(m.price*(m.costRate/100));
   const el=document.getElementById(`mc-${i}`);
-  if(el)el.textContent=`原価 ¥${cp.toLocaleString()} ／ 粗利 ¥${(m.price-cp).toLocaleString()} （粗利率 ${100-m.costRate}%）`;
+  if(el)el.textContent=`原価 ¥${cp.toLocaleString()} ／ 粗利 ¥${(m.price-cp).toLocaleString()}（粗利率 ${100-m.costRate}%）`;
 }
 function deleteMaster(i){if(!confirm(`「${masterItems[i].name}」を削除しますか？`))return;masterItems.splice(i,1);saveMaster();renderMaster();}
 document.getElementById('addMasterBtn').addEventListener('click',()=>{masterItems.push({id:masterNextId++,name:'',price:0,costRate:35});saveMaster();renderMaster();});
@@ -747,7 +840,7 @@ function deleteStaffMaster(i){if(!confirm('削除しますか？'))return;staffM
 document.getElementById('addStaffMasterBtn').addEventListener('click',()=>{staffMaster.push({id:staffMasterNextId++,name:'',wage:0});saveStaffMaster();renderStaffMaster();});
 
 // ── Toast ──
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 </script>
 </body>
 </html>
